@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Fruit Snake Game</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: white;
+      text-align: center;
+      color: black;
+    }
+
+    h1 {
+      margin-top: 20px;
+      color: lightpink;
+    }
+
+    #score {
+      font-size: 22px;
+      margin-top: 10px;
+    }
+
+    #instructions {
+      margin-top: 5px;
+      color: gray;
+    }
+
+    canvas {
+      background: #fff7fa;
+      border: 4px solid lightpink;
+      margin-top: 15px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h1>🍓 Fruit Snake 🍓</h1>
+
+  <div id="score">Score: 0</div>
+
+  <div id="instructions">
+    Use arrow keys to move • Press SPACE to restart
+  </div>
+
+  <canvas id="game" width="400" height="400"></canvas>
+
+  <script>
+
+    const canvas = document.getElementById("game");
+    const ctx = canvas.getContext("2d");
+    const scoreText = document.getElementById("score");
+
+    const box = 20;
+
+    let score = 0;
+    let direction = "RIGHT";
+    let gameOver = false;
+
+    const fruits = [
+      "🍎",
+      "🍓",
+      "🍒",
+      "🍇",
+      "🍑",
+      "🍍",
+      "🥝",
+      "🍉"
+    ];
+
+    let currentFruit =
+      fruits[Math.floor(Math.random() * fruits.length)];
+
+    let snake = [
+      { x: 200, y: 200 }
+    ];
+
+    let food = {
+      x: Math.floor(Math.random() * 20) * box,
+      y: Math.floor(Math.random() * 20) * box
+    };
+
+    document.addEventListener("keydown", handleKeys);
+
+    function handleKeys(event) {
+
+      // SPACE BAR RESTART
+      if (event.code === "Space") {
+        restartGame();
+      }
+
+      // MOVEMENT
+      if (event.key === "ArrowUp" && direction !== "DOWN") {
+        direction = "UP";
+      }
+
+      else if (event.key === "ArrowDown" && direction !== "UP") {
+        direction = "DOWN";
+      }
+
+      else if (event.key === "ArrowLeft" && direction !== "RIGHT") {
+        direction = "LEFT";
+      }
+
+      else if (event.key === "ArrowRight" && direction !== "LEFT") {
+        direction = "RIGHT";
+      }
+    }
+
+    function drawGame() {
+
+      if (gameOver) return;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // DRAW SNAKE
+      for (let i = 0; i < snake.length; i++) {
+
+        ctx.fillStyle =
+          i === 0 ? "#ff9eb5" : "#ffc0cb";
+
+        ctx.fillRect(
+          snake[i].x,
+          snake[i].y,
+          box,
+          box
+        );
+      }
+
+      // DRAW FRUIT
+      ctx.font = "18px Arial";
+
+      ctx.fillText(
+        currentFruit,
+        food.x + 1,
+        food.y + 17
+      );
+
+      let headX = snake[0].x;
+      let headY = snake[0].y;
+
+      if (direction === "UP") {
+        headY -= box;
+      }
+
+      if (direction === "DOWN") {
+        headY += box;
+      }
+
+      if (direction === "LEFT") {
+        headX -= box;
+      }
+
+      if (direction === "RIGHT") {
+        headX += box;
+      }
+
+      // WALL COLLISION
+      if (
+        headX < 0 ||
+        headY < 0 ||
+        headX >= canvas.width ||
+        headY >= canvas.height
+      ) {
+        endGame();
+        return;
+      }
+
+      // SELF COLLISION
+      for (let i = 0; i < snake.length; i++) {
+
+        if (
+          headX === snake[i].x &&
+          headY === snake[i].y
+        ) {
+          endGame();
+          return;
+        }
+      }
+
+      // EAT FRUIT
+      if (
+        headX === food.x &&
+        headY === food.y
+      ) {
+
+        score++;
+
+        scoreText.textContent =
+          "Score: " + score;
+
+        food = {
+          x: Math.floor(Math.random() * 20) * box,
+          y: Math.floor(Math.random() * 20) * box
+        };
+
+        currentFruit =
+          fruits[Math.floor(Math.random() * fruits.length)];
+
+      } else {
+
+        snake.pop();
+      }
+
+      let newHead = {
+        x: headX,
+        y: headY
+      };
+
+      snake.unshift(newHead);
+    }
+
+    function endGame() {
+
+      gameOver = true;
+
+      ctx.fillStyle = "black";
+
+      ctx.font = "30px Arial";
+
+      ctx.fillText(
+        "Game Over!",
+        110,
+        190
+      );
+
+      ctx.font = "18px Arial";
+
+      ctx.fillText(
+        "Press SPACE to restart",
+        110,
+        225
+      );
+    }
+
+    function restartGame() {
+
+      score = 0;
+
+      scoreText.textContent =
+        "Score: 0";
+
+      snake = [
+        { x: 200, y: 200 }
+      ];
+
+      food = {
+        x: Math.floor(Math.random() * 20) * box,
+        y: Math.floor(Math.random() * 20) * box
+      };
+
+      currentFruit =
+        fruits[Math.floor(Math.random() * fruits.length)];
+
+      direction = "RIGHT";
+
+      gameOver = false;
+    }
+
+    setInterval(drawGame, 120);
+
+  </script>
+
+</body>
+</html>
