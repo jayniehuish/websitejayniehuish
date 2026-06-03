@@ -2,266 +2,318 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Fruit Snake Game</title>
+  <title>Emoji Sudoku Levels</title>
 
   <style>
     body {
       margin: 0;
       font-family: Arial, sans-serif;
       background: white;
-      text-align: center;
       color: black;
+      text-align: center;
     }
 
     h1 {
-      margin-top: 20px;
       color: lightpink;
-    }
-
-    #score {
-      font-size: 22px;
-      margin-top: 10px;
+      margin-top: 20px;
     }
 
     #instructions {
-      margin-top: 5px;
+      margin: 10px auto;
+      max-width: 500px;
       color: gray;
+      font-size: 16px;
     }
 
-    canvas {
+    #emojiButtons {
+      margin: 15px;
+    }
+
+    button {
+      font-size: 20px;
+      padding: 10px 14px;
+      margin: 5px;
+      border: 2px solid lightpink;
       background: #fff7fa;
-      border: 4px solid lightpink;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: lightpink;
+    }
+
+    #board {
+      display: grid;
+      grid-template-columns: repeat(4, 70px);
+      grid-template-rows: repeat(4, 70px);
+      justify-content: center;
       margin-top: 15px;
+    }
+
+    .cell {
+      width: 70px;
+      height: 70px;
+      border: 1px solid #ccc;
+      font-size: 34px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      background: white;
+    }
+
+    .cell:nth-child(2),
+    .cell:nth-child(6),
+    .cell:nth-child(10),
+    .cell:nth-child(14) {
+      border-right: 4px solid lightpink;
+    }
+
+    .cell:nth-child(5),
+    .cell:nth-child(6),
+    .cell:nth-child(7),
+    .cell:nth-child(8) {
+      border-bottom: 4px solid lightpink;
+    }
+
+    .given {
+      background: #ffe6ef;
+      cursor: not-allowed;
+      font-weight: bold;
+    }
+
+    .wrong {
+      background: #ffd6d6;
+    }
+
+    #message {
+      margin-top: 15px;
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    #popup {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(255, 240, 247, 0.95);
+      z-index: 10;
+      text-align: center;
+      padding-top: 120px;
+      font-size: 40px;
+    }
+
+    #popupBox {
+      background: white;
+      border: 5px solid lightpink;
+      border-radius: 20px;
+      padding: 30px;
+      width: 350px;
+      margin: auto;
+      box-shadow: 0 0 20px gray;
+    }
+
+    #confetti {
+      font-size: 50px;
+    }
+
+    #backButton {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      z-index: 100;
     }
   </style>
 </head>
 
 <body>
+  <button id="backButton" onclick="location.href='../index.html'">← Back</button>
 
-  <h1>🍓 Fruit Snake 🍓</h1>
-
-  <div id="score">Score: 0</div>
+  <h1 id="title">🍓 Fruit Sudoku 🍒</h1>
 
   <div id="instructions">
-    Use arrow keys to move • Press SPACE to restart
+    Level 1: Fill the board so each row, column, and pink box has each emoji one time.
   </div>
 
-  <canvas id="game" width="400" height="400"></canvas>
+  <div id="emojiButtons"></div>
+
+  <div id="board"></div>
+
+  <div id="message"></div>
+
+  <button onclick="submitLevel()">Submit</button>
+  <button onclick="restartLevel()">Restart</button>
+
+  <div id="popup">
+    <div id="popupBox">
+      <div id="confetti">🎉✨🎊🥳🎊✨🎉</div>
+      <h2>You win the game!</h2>
+      <div style="font-size: 70px;">🏆</div>
+    </div>
+  </div>
 
   <script>
+    const board = document.getElementById("board");
+    const message = document.getElementById("message");
+    const title = document.getElementById("title");
+    const instructions = document.getElementById("instructions");
+    const emojiButtons = document.getElementById("emojiButtons");
+    const popup = document.getElementById("popup");
 
-    const canvas = document.getElementById("game");
-    const ctx = canvas.getContext("2d");
-    const scoreText = document.getElementById("score");
+    let level = 1;
+    let selectedEmoji = "";
+    let currentBoard = [];
 
-    const box = 20;
+    const levels = {
+      1: {
+        title: "🍓 Fruit Sudoku 🍒",
+        instructions: "Level 1: Fill the board so each row, column, and pink box has each emoji one time.",
+        emojis: ["🍓", "🍋", "🫐", "🍒"],
+        solution: [
+          ["🍓", "🍋", "🫐", "🍒"],
+          ["🫐", "🍒", "🍓", "🍋"],
+          ["🍋", "🍓", "🍒", "🫐"],
+          ["🍒", "🫐", "🍋", "🍓"]
+        ],
+        puzzle: [
+          ["🍓", "", "", "🍒"],
+          ["", "🍒", "", ""],
+          ["", "", "🍒", ""],
+          ["🍒", "", "", "🍓"]
+        ]
+      },
 
-    let score = 0;
-    let direction = "RIGHT";
-    let gameOver = false;
-
-    const fruits = [
-      "🍎",
-      "🍓",
-      "🍒",
-      "🍇",
-      "🍑",
-      "🍍",
-      "🥝",
-      "🍉"
-    ];
-
-    let currentFruit =
-      fruits[Math.floor(Math.random() * fruits.length)];
-
-    let snake = [
-      { x: 200, y: 200 }
-    ];
-
-    let food = {
-      x: Math.floor(Math.random() * 20) * box,
-      y: Math.floor(Math.random() * 20) * box
+      2: {
+        title: "☀️ Beach Sudoku 🏖️",
+        instructions: "Level 2: This one is harder! Fill the board correctly, then press Submit.",
+        emojis: ["☀️", "🌊", "🌴", "🏖️"],
+        solution: [
+          ["☀️", "🌊", "🌴", "🏖️"],
+          ["🌴", "🏖️", "☀️", "🌊"],
+          ["🌊", "☀️", "🏖️", "🌴"],
+          ["🏖️", "🌴", "🌊", "☀️"]
+        ],
+        puzzle: [
+          ["☀️", "", "", ""],
+          ["", "🏖️", "", ""],
+          ["", "", "", "🌴"],
+          ["", "", "🌊", ""]
+        ]
+      }
     };
 
-    document.addEventListener("keydown", handleKeys);
+    function startLevel() {
+      const currentLevel = levels[level];
 
-    function handleKeys(event) {
+      title.textContent = currentLevel.title;
+      instructions.textContent = currentLevel.instructions;
+      message.textContent = "";
+      board.innerHTML = "";
+      emojiButtons.innerHTML = "";
+      selectedEmoji = currentLevel.emojis[0];
 
-      // SPACE BAR RESTART
-      if (event.code === "Space") {
-        restartGame();
+      currentBoard = JSON.parse(JSON.stringify(currentLevel.puzzle));
+
+      for (let i = 0; i < currentLevel.emojis.length; i++) {
+        const button = document.createElement("button");
+        button.textContent = currentLevel.emojis[i];
+        button.onclick = function () {
+          selectedEmoji = currentLevel.emojis[i];
+        };
+        emojiButtons.appendChild(button);
       }
 
-      // MOVEMENT
-      if (event.key === "ArrowUp" && direction !== "DOWN") {
-        direction = "UP";
-      }
+      const eraseButton = document.createElement("button");
+      eraseButton.textContent = "Erase";
+      eraseButton.onclick = function () {
+        selectedEmoji = "";
+      };
+      emojiButtons.appendChild(eraseButton);
 
-      else if (event.key === "ArrowDown" && direction !== "UP") {
-        direction = "DOWN";
-      }
+      for (let row = 0; row < 4; row++) {
+        for (let col = 0; col < 4; col++) {
+          const cell = document.createElement("div");
+          cell.classList.add("cell");
 
-      else if (event.key === "ArrowLeft" && direction !== "RIGHT") {
-        direction = "LEFT";
-      }
+          if (currentLevel.puzzle[row][col] !== "") {
+            cell.classList.add("given");
+            cell.textContent = currentLevel.puzzle[row][col];
+          }
 
-      else if (event.key === "ArrowRight" && direction !== "LEFT") {
-        direction = "RIGHT";
+          cell.dataset.row = row;
+          cell.dataset.col = col;
+
+          cell.addEventListener("click", function () {
+            placeEmoji(cell);
+          });
+
+          board.appendChild(cell);
+        }
       }
     }
 
-    function drawGame() {
+    function placeEmoji(cell) {
+      const row = cell.dataset.row;
+      const col = cell.dataset.col;
 
-      if (gameOver) return;
-
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      // DRAW SNAKE
-      for (let i = 0; i < snake.length; i++) {
-
-        ctx.fillStyle =
-          i === 0 ? "#ff9eb5" : "#ffc0cb";
-
-        ctx.fillRect(
-          snake[i].x,
-          snake[i].y,
-          box,
-          box
-        );
-      }
-
-      // DRAW FRUIT
-      ctx.font = "18px Arial";
-
-      ctx.fillText(
-        currentFruit,
-        food.x + 1,
-        food.y + 17
-      );
-
-      let headX = snake[0].x;
-      let headY = snake[0].y;
-
-      if (direction === "UP") {
-        headY -= box;
-      }
-
-      if (direction === "DOWN") {
-        headY += box;
-      }
-
-      if (direction === "LEFT") {
-        headX -= box;
-      }
-
-      if (direction === "RIGHT") {
-        headX += box;
-      }
-
-      // WALL COLLISION
-      if (
-        headX < 0 ||
-        headY < 0 ||
-        headX >= canvas.width ||
-        headY >= canvas.height
-      ) {
-        endGame();
+      if (cell.classList.contains("given")) {
         return;
       }
 
-      // SELF COLLISION
-      for (let i = 0; i < snake.length; i++) {
+      cell.textContent = selectedEmoji;
+      currentBoard[row][col] = selectedEmoji;
+      cell.classList.remove("wrong");
+    }
 
-        if (
-          headX === snake[i].x &&
-          headY === snake[i].y
-        ) {
-          endGame();
-          return;
+    function submitLevel() {
+      const currentLevel = levels[level];
+      let correct = true;
+
+      const cells = document.querySelectorAll(".cell");
+
+      for (let row = 0; row < 4; row++) {
+        for (let col = 0; col < 4; col++) {
+          const index = row * 4 + col;
+
+          if (currentBoard[row][col] !== currentLevel.solution[row][col]) {
+            correct = false;
+
+            if (!cells[index].classList.contains("given")) {
+              cells[index].classList.add("wrong");
+            }
+          }
         }
       }
 
-      // EAT FRUIT
-      if (
-        headX === food.x &&
-        headY === food.y
-      ) {
+      if (correct && level === 1) {
+        message.textContent = "Great job! Moving to level 2 🌊";
+        message.style.color = "lightpink";
 
-        score++;
-
-        scoreText.textContent =
-          "Score: " + score;
-
-        food = {
-          x: Math.floor(Math.random() * 20) * box,
-          y: Math.floor(Math.random() * 20) * box
-        };
-
-        currentFruit =
-          fruits[Math.floor(Math.random() * fruits.length)];
-
-      } else {
-
-        snake.pop();
+        setTimeout(function () {
+          level = 2;
+          startLevel();
+        }, 1000);
       }
 
-      let newHead = {
-        x: headX,
-        y: headY
-      };
+      else if (correct && level === 2) {
+        popup.style.display = "block";
+      }
 
-      snake.unshift(newHead);
+      else {
+        message.textContent = "Some are wrong — fix the red boxes!";
+        message.style.color = "red";
+      }
     }
 
-    function endGame() {
-
-      gameOver = true;
-
-      ctx.fillStyle = "black";
-
-      ctx.font = "30px Arial";
-
-      ctx.fillText(
-        "Game Over!",
-        110,
-        190
-      );
-
-      ctx.font = "18px Arial";
-
-      ctx.fillText(
-        "Press SPACE to restart",
-        110,
-        225
-      );
+    function restartLevel() {
+      startLevel();
     }
 
-    function restartGame() {
-
-      score = 0;
-
-      scoreText.textContent =
-        "Score: 0";
-
-      snake = [
-        { x: 200, y: 200 }
-      ];
-
-      food = {
-        x: Math.floor(Math.random() * 20) * box,
-        y: Math.floor(Math.random() * 20) * box
-      };
-
-      currentFruit =
-        fruits[Math.floor(Math.random() * fruits.length)];
-
-      direction = "RIGHT";
-
-      gameOver = false;
-    }
-
-    setInterval(drawGame, 120);
-
+    startLevel();
   </script>
 
 </body>
