@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="description" content="Jaynie's Hobbies — Painting, Nails, Family, Friends & Traveling">
+    <title>Jaynie's Hobbies</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            background: repeating-linear-gradient(
+                90deg,
+                #ffffff 0px,
+                #ffffff 40px,
+                rgba(230, 180, 200, 0.35) 40px,
+                rgba(230, 180, 200, 0.35) 80px
+            );
+            color: #333;
+        }
+
+        header {
+            background: #fff;
+            border-bottom: 3px solid #ff99d4;
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+            color: #333;
+            font-weight: bold;
+        }
+
+        header p {
+            margin: 10px 0 0 0;
+            font-size: 1rem;
+            color: #6b6b6b;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .back-button {
+            display: inline-block;
+            margin-bottom: 30px;
+            background: #ff99d4;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: bold;
+            transition: background 0.3s ease;
+            border: none;
+            cursor: pointer;
+            font-size: 0.95rem;
+        }
+
+        .back-button:hover {
+            background: #ff77c3;
+        }
+
+        .hobbies-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 25px;
+            margin: 40px auto 0;
+            max-width: 500px;
+        }
+
+        .hobby-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .hobby-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+        }
+
+        .hobby-image-placeholder {
+            width: 100%;
+            height: 380px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3.5rem;
+            color: #333;
+            background: #ffe6f2;
+        }
+
+        .hobby-image-placeholder img {
+            width: auto;
+            height: 100%;
+            max-width: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .hobby-images {
+            display: flex;
+            gap: 10px;
+            padding: 20px;
+            justify-content: center;
+            background: #ffe6f2;
+        }
+
+        .hobby-images img {
+            width: calc(33.33% - 6.66px);
+            height: 120px;
+            object-fit: cover;
+            border-radius: 12px;
+            border: 2px solid #ffe6f2;
+        }
+
+        .hobby-content {
+            padding: 25px;
+        }
+
+        .hobby-content h2 {
+            margin: 0 0 12px 0;
+            font-size: 1.5rem;
+            color: #ff99d4;
+            font-weight: bold;
+        }
+
+        .hobby-content p {
+            margin: 0;
+            line-height: 1.6;
+            color: #666;
+            font-size: 0.95rem;
+        }
+
+        footer {
+            text-align: center;
+            padding: 30px 20px;
+            color: #6b6b6b;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 640px) {
+            header h1 {
+                font-size: 1.8rem;
+            }
+
+            .container {
+                padding: 20px 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>My Hobbies</h1>
+        <p>Things that bring me joy</p>
+    </header>
+
+    <div class="container">
+        <a href="index.html" class="back-button">← Back to Home</a>
+
+        <div class="hobbies-grid">
+            <!-- Painting -->
+            <div class="hobby-card">
+                <div class="hobby-images">
+                    <img src="art1.jpeg" alt="Painting art 1">
+                    <img src="art2.jpeg" alt="Painting art 2">
+                    <img src="art3.jpeg" alt="Painting art 3">
+                </div>
+                <div class="hobby-content">
+                    <h2>Painting</h2>
+                    <p>I love creating beautiful artwork, especially custom scripture art for clients. From sketching to final touches, painting is my creative outlet where I can express emotion and storytelling through colors and brushstrokes.</p>
+                </div>
+            </div>
+
+            <!-- Watching Hockey -->
+            <div class="hobby-card">
+                <div class="hobby-images" style="padding: 20px 10px; gap: 10px;">
+                    <img src="hockey.jpeg" alt="Hockey 1">
+                    <img src="h.jpeg" alt="Hockey 2">
+                    <img src="h2.jpeg" alt="Hockey 3">
+                </div>
+                <div class="hobby-content">
+                    <h2>Watching Hockey</h2>
+                    <p>I'm a huge hockey fan and love supporting the Utah Mammoth! There's nothing quite like the energy and excitement of a live game. Whether I'm cheering from the stands or watching with friends, hockey brings so much joy and adrenaline to my life.</p>
+                </div>
+            </div>
+
+            <!-- Diet Coke -->
+            <div class="hobby-card">
+                <div class="hobby-images" style="padding: 20px 10px; gap: 10px;">
+                    <img src="n1.JPG" alt="Diet Coke 1">
+                    <img src="n2.png" alt="Diet Coke 2">
+                    <img src="n.jpeg" alt="Diet Coke 3">
+                </div>
+                <div class="hobby-content">
+                    <h2>Getting a Diet Coke</h2>
+                    <p>One of my favorite little treats is grabbing a cold Diet Coke. It’s the perfect pick-me-up whether I’m cheering on the Utah Mammoth, hanging out with friends, or just enjoying a quiet moment.</p>
+                </div>
+            </div>
+
+            <!-- Nails -->
+            <div class="hobby-card">
+                <div class="hobby-images" style="padding: 20px 10px; gap: 10px;">
+                    <img src="nails.jpeg" alt="Nail art 1">
+                    <img src="a.jpeg" alt="Nail art 2">
+                    <img src="aa.png" alt="Nail art 3">
+                </div>
+                <div class="hobby-content">
+                    <h2>Doing Nails</h2>
+                    <p>As a nail technician, I get to transform nails into miniature works of art. Whether it's intricate designs, vibrant colors, or elegant finishes, creating beautiful nails for my clients brings so much satisfaction and joy to my days.</p>
+                </div>
+            </div>
+
+            <!-- Hangout with Family -->
+            <div class="hobby-card">
+                <div class="hobby-image-placeholder">
+                    <img src="family.jpeg" alt="Family hangout" style="width:100%; height:100%; object-fit:cover; border-radius:0; border:none;">
+                </div>
+                <div class="hobby-content">
+                    <h2>Hangout with Family</h2>
+                    <p>Spending quality time with my loved ones is everything to me. Whether we're laughing together, supporting each other, or just enjoying each other's company, these moments are the most precious and memorable.</p>
+                </div>
+            </div>
+
+            <!-- Traveling -->
+            <div class="hobby-card">
+                <div class="hobby-images" style="padding: 20px 10px; gap: 10px;">
+                    <img src="travel.JPG" alt="Travel 1">
+                    <img src="t.jpg" alt="Travel 2">
+                    <img src="t2.jpeg" alt="Travel 3">
+                </div>
+                <div class="hobby-content">
+                    <h2>Traveling</h2>
+                    <p>Exploring new places, experiencing different cultures, and discovering hidden gems around the world fuels my adventurous spirit. From my mission in Chile to dream destinations, travel opens my heart and mind to endless possibilities.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 Jaynie Huish. All rights reserved.</p>
+    </footer>
+</body>
+</html>

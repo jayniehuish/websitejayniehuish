@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Emoji Sudoku Levels</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: white;
+      color: black;
+      text-align: center;
+    }
+
+    h1 {
+      color: lightpink;
+      margin-top: 20px;
+    }
+
+    #instructions {
+      margin: 10px auto;
+      max-width: 500px;
+      color: gray;
+      font-size: 16px;
+    }
+
+    #emojiButtons {
+      margin: 15px;
+    }
+
+    button {
+      font-size: 20px;
+      padding: 10px 14px;
+      margin: 5px;
+      border: 2px solid lightpink;
+      background: #fff7fa;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: lightpink;
+    }
+
+    #board {
+      display: grid;
+      grid-template-columns: repeat(4, 70px);
+      grid-template-rows: repeat(4, 70px);
+      justify-content: center;
+      margin-top: 15px;
+    }
+
+    .cell {
+      width: 70px;
+      height: 70px;
+      border: 1px solid #ccc;
+      font-size: 34px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      background: white;
+    }
+
+    .cell:nth-child(2),
+    .cell:nth-child(6),
+    .cell:nth-child(10),
+    .cell:nth-child(14) {
+      border-right: 4px solid lightpink;
+    }
+
+    .cell:nth-child(5),
+    .cell:nth-child(6),
+    .cell:nth-child(7),
+    .cell:nth-child(8) {
+      border-bottom: 4px solid lightpink;
+    }
+
+    .given {
+      background: #ffe6ef;
+      cursor: not-allowed;
+      font-weight: bold;
+    }
+
+    .wrong {
+      background: #ffd6d6;
+    }
+
+    #message {
+      margin-top: 15px;
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    #popup {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(255, 240, 247, 0.95);
+      z-index: 10;
+      text-align: center;
+      padding-top: 120px;
+      font-size: 40px;
+    }
+
+    #popupBox {
+      background: white;
+      border: 5px solid lightpink;
+      border-radius: 20px;
+      padding: 30px;
+      width: 350px;
+      margin: auto;
+      box-shadow: 0 0 20px gray;
+    }
+
+    #confetti {
+      font-size: 50px;
+    }
+
+    #backButton {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      z-index: 100;
+    }
+  </style>
+</head>
+
+<body>
+  <button id="backButton" onclick="location.href='../index.html'">← Back</button>
+
+  <h1 id="title">🍓 Fruit Sudoku 🍒</h1>
+
+  <div id="instructions">
+    Level 1: Fill the board so each row, column, and pink box has each emoji one time.
+  </div>
+
+  <div id="emojiButtons"></div>
+
+  <div id="board"></div>
+
+  <div id="message"></div>
+
+  <button onclick="submitLevel()">Submit</button>
+  <button onclick="restartLevel()">Restart</button>
+
+  <div id="popup">
+    <div id="popupBox">
+      <div id="confetti">🎉✨🎊🥳🎊✨🎉</div>
+      <h2>You win the game!</h2>
+      <div style="font-size: 70px;">🏆</div>
+    </div>
+  </div>
+
+  <script>
+    const board = document.getElementById("board");
+    const message = document.getElementById("message");
+    const title = document.getElementById("title");
+    const instructions = document.getElementById("instructions");
+    const emojiButtons = document.getElementById("emojiButtons");
+    const popup = document.getElementById("popup");
+
+    let level = 1;
+    let selectedEmoji = "";
+    let currentBoard = [];
+
+    const levels = {
+      1: {
+        title: "🍓 Fruit Sudoku 🍒",
+        instructions: "Level 1: Fill the board so each row, column, and pink box has each emoji one time.",
+        emojis: ["🍓", "🍋", "🫐", "🍒"],
+        solution: [
+          ["🍓", "🍋", "🫐", "🍒"],
+          ["🫐", "🍒", "🍓", "🍋"],
+          ["🍋", "🍓", "🍒", "🫐"],
+          ["🍒", "🫐", "🍋", "🍓"]
+        ],
+        puzzle: [
+          ["🍓", "", "", "🍒"],
+          ["", "🍒", "", ""],
+          ["", "", "🍒", ""],
+          ["🍒", "", "", "🍓"]
+        ]
+      },
+
+      2: {
+        title: "☀️ Beach Sudoku 🏖️",
+        instructions: "Level 2: This one is harder! Fill the board correctly, then press Submit.",
+        emojis: ["☀️", "🌊", "🌴", "🏖️"],
+        solution: [
+          ["☀️", "🌊", "🌴", "🏖️"],
+          ["🌴", "🏖️", "☀️", "🌊"],
+          ["🌊", "☀️", "🏖️", "🌴"],
+          ["🏖️", "🌴", "🌊", "☀️"]
+        ],
+        puzzle: [
+          ["☀️", "", "", ""],
+          ["", "🏖️", "", ""],
+          ["", "", "", "🌴"],
+          ["", "", "🌊", ""]
+        ]
+      }
+    };
+
+    function startLevel() {
+      const currentLevel = levels[level];
+
+      title.textContent = currentLevel.title;
+      instructions.textContent = currentLevel.instructions;
+      message.textContent = "";
+      board.innerHTML = "";
+      emojiButtons.innerHTML = "";
+      selectedEmoji = currentLevel.emojis[0];
+
+      currentBoard = JSON.parse(JSON.stringify(currentLevel.puzzle));
+
+      for (let i = 0; i < currentLevel.emojis.length; i++) {
+        const button = document.createElement("button");
+        button.textContent = currentLevel.emojis[i];
+        button.onclick = function () {
+          selectedEmoji = currentLevel.emojis[i];
+        };
+        emojiButtons.appendChild(button);
+      }
+
+      const eraseButton = document.createElement("button");
+      eraseButton.textContent = "Erase";
+      eraseButton.onclick = function () {
+        selectedEmoji = "";
+      };
+      emojiButtons.appendChild(eraseButton);
+
+      for (let row = 0; row < 4; row++) {
+        for (let col = 0; col < 4; col++) {
+          const cell = document.createElement("div");
+          cell.classList.add("cell");
+
+          if (currentLevel.puzzle[row][col] !== "") {
+            cell.classList.add("given");
+            cell.textContent = currentLevel.puzzle[row][col];
+          }
+
+          cell.dataset.row = row;
+          cell.dataset.col = col;
+
+          cell.addEventListener("click", function () {
+            placeEmoji(cell);
+          });
+
+          board.appendChild(cell);
+        }
+      }
+    }
+
+    function placeEmoji(cell) {
+      const row = cell.dataset.row;
+      const col = cell.dataset.col;
+
+      if (cell.classList.contains("given")) {
+        return;
+      }
+
+      cell.textContent = selectedEmoji;
+      currentBoard[row][col] = selectedEmoji;
+      cell.classList.remove("wrong");
+    }
+
+    function submitLevel() {
+      const currentLevel = levels[level];
+      let correct = true;
+
+      const cells = document.querySelectorAll(".cell");
+
+      for (let row = 0; row < 4; row++) {
+        for (let col = 0; col < 4; col++) {
+          const index = row * 4 + col;
+
+          if (currentBoard[row][col] !== currentLevel.solution[row][col]) {
+            correct = false;
+
+            if (!cells[index].classList.contains("given")) {
+              cells[index].classList.add("wrong");
+            }
+          }
+        }
+      }
+
+      if (correct && level === 1) {
+        message.textContent = "Great job! Moving to level 2 🌊";
+        message.style.color = "lightpink";
+
+        setTimeout(function () {
+          level = 2;
+          startLevel();
+        }, 1000);
+      }
+
+      else if (correct && level === 2) {
+        popup.style.display = "block";
+      }
+
+      else {
+        message.textContent = "Some are wrong — fix the red boxes!";
+        message.style.color = "red";
+      }
+    }
+
+    function restartLevel() {
+      startLevel();
+    }
+
+    startLevel();
+  </script>
+
+</body>
+</html>
